@@ -1,0 +1,7 @@
+{
+  "name": "schedulink",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
