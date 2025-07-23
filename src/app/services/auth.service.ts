@@ -32,9 +32,13 @@ export class AuthService {
 
   // ✅ Get current session
   async getSession() {
-    const { data, error } = await this.supabase.auth.getSession();
-    if (error) throw error;
-    return data.session;
+    const { data: sessionData, error: sessionError } = await this.supabase.auth.getSession();
+    if (sessionError) throw sessionError;
+
+    const { data: userData, error: userError } = await this.supabase.auth.getUser();
+    if (userError || !userData?.user) return null;
+
+    return sessionData.session;
   }
 
   // ✅ Get current user
