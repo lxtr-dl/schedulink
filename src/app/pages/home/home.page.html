@@ -1,20 +1,58 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-title class="ion-text-center">Upcoming Schedule</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  <!-- Schedule Card -->
+  <ion-card class="schedule-card">
+    <ion-card-header>
+      <ion-card-title>Sunday, June X</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-item *ngFor="let item of lineup" lines="none" class="role-item">
+        <ion-label>{{ item.role }}</ion-label>
+        <ion-badge [color]="getBadgeColor(item.status)">
+          {{ item.status }}
+        </ion-badge>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Rehearsal Info -->
+  <ion-card class="rehearsal-card">
+    <ion-card-header>
+      <ion-card-title>Rehearsal Day</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Saturday 00:00</p>
+      <p>Devotion host - Bro. Alden</p>
+      <p>Devotion speaker - Bronny</p>
+    </ion-card-content>
+  </ion-card>
+
 </ion-content>
+
+<!-- Bottom Navigation -->
+<ion-footer class="footer-tabs">
+  <ion-tab-bar slot="bottom" color="primary">
+    <ion-tab-button tab="home">
+      <ion-icon name="home-outline"></ion-icon>
+    </ion-tab-button>
+    <ion-tab-button tab="calendar">
+      <ion-icon name="calendar-outline"></ion-icon>
+    </ion-tab-button>
+    <ion-tab-button tab="roles">
+      <ion-icon name="hand-left-outline"></ion-icon>
+    </ion-tab-button>
+    <ion-tab-button tab="music">
+      <ion-icon name="musical-notes-outline"></ion-icon>
+    </ion-tab-button>
+    <ion-tab-button tab="announcements">
+      <ion-icon name="megaphone-outline"></ion-icon>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-footer>

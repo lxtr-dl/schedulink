@@ -1,27 +1,27 @@
-#container {
-  text-align: center;
-
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+.schedule-card, .rehearsal-card {
+  background: #5e0c77; // deep purple
+  color: white;
+  border-radius: 15px;
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.role-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
+ion-badge {
+  font-size: 0.8rem;
+  text-transform: capitalize;
 }
 
-#container a {
-  text-decoration: none;
+.footer-tabs {
+  ion-tab-bar {
+    background: #5e0c77;
+    color: white;
+  }
+
+  ion-tab-button {
+    --color: white;
+  }
 }
