@@ -4,20 +4,18 @@ import { LoginPage } from './pages/login/login.page';
 import { AuthGuard } from './guards/auth.guard'; 
 const routes: Routes = [
   {
-    path: 'home',
-    loadChildren: () =>
-      import('./pages/home/home.module').then(m => m.HomePageModule),
-    canActivate: [AuthGuard]
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
   },
   {
     path: 'login',
     loadComponent: () => import('./pages/login/login.page').then(m => m.LoginPage)
   },
   {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full'
-  },
+    path: 'tabs',
+    loadChildren: () => import('./pages/tabs/tabs.module').then(m => m.TabsPageModule)
+  }
 ];
 
 

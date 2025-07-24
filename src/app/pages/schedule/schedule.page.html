@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Schedules</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list *ngFor="let week of schedules">
+    <ion-card>
+      <ion-card-header (click)="toggleWeek(week.date)">
+        <ion-card-title>{{ week.date }}</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content *ngIf="expandedWeeks.includes(week.date)">
+        <!-- Assignments Loop -->
+        <ion-item *ngFor="let role of week.assignments">
+          <ion-label>
+            <h3>{{ role.role }}</h3>
+            <p>{{ role.persons.join(', ') }}</p>
+          </ion-label>
+          <ion-badge [color]="getStatusColor(role.status)" slot="end">
+            {{ role.status }}
+          </ion-badge>
+        </ion-item>
+
+        <!-- Rehearsal Section -->
+        <ion-card class="rehearsal-card">
+          <ion-card-header>
+            <ion-card-title>Rehearsal Day</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p *ngIf="week.rehearsalDateTime; else noRehearsal">
+              {{ week.rehearsalDateTime }}
+            </p>
+            <ng-template #noRehearsal>
+              <p>No Confirmed Date</p>
+            </ng-template>
+            <p><strong>Devotion Host:</strong> {{ week.devotionHost || 'TBD' }}</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-card-content>
+    </ion-card>
+  </ion-list>
+</ion-content>

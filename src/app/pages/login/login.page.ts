@@ -45,7 +45,7 @@ export class LoginPage implements OnInit { // Added OnInit for consistency, thou
     try {
       const session = await this.authService.getSession();
       if (session) {
-        this.router.navigate(['/home']);
+        this.router.navigate(['/tabs/home']);
       }
     } catch (error) {
       console.error('Session check failed:', error);
@@ -59,7 +59,7 @@ export class LoginPage implements OnInit { // Added OnInit for consistency, thou
     try {
       await this.authService.login(email, password);
       await this.userService.loadCurrentUser(); // 👈 fetch user roles
-      this.router.navigate(['/home']);
+      this.router.navigate(['/tabs/home']);
     } catch (error: any) {
       this.errorMessage = error.message || 'Login failed.';
     }
