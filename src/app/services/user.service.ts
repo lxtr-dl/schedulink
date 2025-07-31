@@ -15,6 +15,11 @@ export class UserService {
     this.supabase = this.authService.getClient();
   }
 
+  clearCurrentUser() {
+    this._currentUser = null;
+  }
+
+
   // ✅ Fetch user profile from `users` table using uid
   async loadCurrentUser() {
     const supaUser = await this.authService.getUser();

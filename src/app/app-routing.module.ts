@@ -1,7 +1,8 @@
-import { NgModule } from '@angular/core';
+import { NgModule } from '@angular/core'; // Keep NgModule
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { LoginPage } from './pages/login/login.page';
-import { AuthGuard } from './guards/auth.guard'; 
+// No need to import LoginPage or RolesPage directly here if they are lazy-loaded via their modules.
+import { AuthGuard } from './guards/auth.guard';
+
 const routes: Routes = [
   {
     path: 'home',
@@ -11,15 +12,23 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    loadComponent: () => import('./pages/login/login.page').then(m => m.LoginPage)
+    // CHANGE THIS: Use loadChildren for non-standalone pages that are part of a module.
+    loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule)
   },
   {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'
   },
+  {
+    path: 'roles',
+    // This already uses loadChildren, which is correct for a non-standalone RolesPage.
+    loadChildren: () => import('./pages/roles/roles.module').then(m => m.RolesPageModule)
+    // You might want to add canActivate: [AuthGuard] here too, so only logged-in users can access roles.
+  },
 ];
 
+// ENSURE THIS @NgModule BLOCK IS UNCOMMENTED AND ACTIVE:
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })

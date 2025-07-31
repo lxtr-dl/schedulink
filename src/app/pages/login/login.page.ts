@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core'; // Keep OnInit if you use it, or remove if not needed
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'; // Import ReactiveFormsModule
-import { CommonModule } from '@angular/common'; // Import CommonModule for *ngIf
-import { IonicModule } from '@ionic/angular'; // Import IonicModule for all Ionic components
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms'; // Keep FormBuilder, FormGroup, Validators
+import { ToastController } from '@ionic/angular'; // Keep ToastController here as it's injected
 
-// Keep your existing service imports
+// REMOVE these imports from here:
+// import { CommonModule } from '@angular/common';
+// import { ReactiveFormsModule } from '@angular/forms';
+// import { IonicModule } from '@ionic/angular';
+
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { UserService } from 'src/app/services/user.service';
@@ -12,14 +15,15 @@ import { UserService } from 'src/app/services/user.service';
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  standalone: true, // This is crucial for fixing the previous NG6008 error and using imports directly
-  imports: [
-    CommonModule,        // Provides *ngIf
-    ReactiveFormsModule, // Provides [formGroup] and formControlName
-    IonicModule          // Provides all ion-* components (ion-header, ion-content, ion-input, ion-button, etc.)
-  ]
+  standalone: false, // <--- Ensure this is false or remove it
+  // REMOVE THIS ENTIRE 'imports' ARRAY:
+  // imports: [
+  //   CommonModule,
+  //   ReactiveFormsModule,
+  //   IonicModule
+  // ]
 })
-export class LoginPage implements OnInit { // Added OnInit for consistency, though your form is in constructor
+export class LoginPage implements OnInit {
   loginForm: FormGroup;
   errorMessage = '';
 
@@ -27,16 +31,15 @@ export class LoginPage implements OnInit { // Added OnInit for consistency, thou
     private fb: FormBuilder,
     private authService: AuthService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private toastCtrl: ToastController
   ) {
-    // Initialize form in constructor, as in your original code
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
   }
 
-  // Add ngOnInit if you plan to do any initialization after constructor
   ngOnInit() {
     this.checkSessionAndRedirect();
   }
@@ -45,23 +48,74 @@ export class LoginPage implements OnInit { // Added OnInit for consistency, thou
     try {
       const session = await this.authService.getSession();
       if (session) {
+        console.log('Session found on login page init, redirecting to home.');
+        await this.userService.loadCurrentUser();
         this.router.navigate(['/home']);
+      } else {
+        console.log('No session found on login page init.');
       }
     } catch (error) {
       console.error('Session check failed:', error);
+      const toast = await this.toastCtrl.create({
+        message: 'Could not check session. Please try logging in.',
+        duration: 3000,
+        color: 'warning'
+      });
+      toast.present();
     }
   }
 
   async onLogin() {
     this.errorMessage = '';
+
+    if (this.loginForm.invalid) {
+      this.errorMessage = 'Please enter a valid email and password.';
+      const toast = await this.toastCtrl.create({
+        message: this.errorMessage,
+        duration: 3000,
+        color: 'warning'
+      });
+      toast.present();
+      return;
+    }
+
     const { email, password } = this.loginForm.value;
+    console.log('Attempting login with:', email);
 
     try {
-      await this.authService.login(email, password);
-      await this.userService.loadCurrentUser(); // 👈 fetch user roles
-      this.router.navigate(['/home']);
+      const { user, session } = await this.authService.login(email, password);
+
+      if (user && session) {
+        console.log('Login successful for user:', user.email);
+        await this.userService.loadCurrentUser();
+        console.log('User profile loaded:', this.userService.currentUser);
+        await this.router.navigate(['/home']); // ✅ Add await
+        return; // ✅ Stop further execution
+      } else {
+        this.errorMessage = 'Login failed: Unexpected response from server.';
+        const toast = await this.toastCtrl.create({
+          message: this.errorMessage,
+          duration: 3000,
+          color: 'danger'
+        });
+        toast.present();
+      }
     } catch (error: any) {
-      this.errorMessage = error.message || 'Login failed.';
+      console.error('Login error:', error);
+      if (error.message.includes('Invalid login credentials')) {
+        this.errorMessage = 'Invalid email or password.';
+      } else if (error.message.includes('Email not confirmed')) {
+        this.errorMessage = 'Please confirm your email address.';
+      } else {
+        this.errorMessage = error.message || 'Login failed. Please try again.';
+      }
+
+      const toast = await this.toastCtrl.create({
+        message: this.errorMessage,
+        duration: 3000,
+        color: 'danger'
+      });
+      toast.present();
     }
   }
 }
