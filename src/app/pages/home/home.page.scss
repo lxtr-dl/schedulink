@@ -15,6 +15,13 @@ ion-badge {
   text-transform: capitalize;
 }
 
+.role-info {
+  color: white; /* TEMP fix for dark mode */
+  padding: 16px;
+  font-size: 16px;
+}
+
+
 .footer-tabs {
   ion-tab-bar {
     background: #5e0c77;
@@ -25,3 +32,5 @@ ion-badge {
     --color: white;
   }
 }
+
+

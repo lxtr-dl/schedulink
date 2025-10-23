@@ -34,4 +34,12 @@
     </ion-card-content>
   </ion-card>
 
+  <div class="role-info">
+    <div *ngIf="authService.isAdmin()">Welcome, Admin!</div>
+    <div *ngIf="authService.isWorshipLeader()">Welcome, Worship Leader!</div>
+    <div *ngIf="authService.hasRole('member')">Welcome, Member!</div>
+    <div *ngIf="authService.hasPosition('main keyboard')">You play Main Keyboard.</div>
+  </div>
+
+
 </ion-content>
