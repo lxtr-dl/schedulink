@@ -1,0 +1,32 @@
+<!-- src/app/pages/roles/roles.page.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Roles & Volunteers</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Segment / tabs for subsections -->
+  <ion-segment value="roles" (ionChange)="segmentChanged($event)">
+    <ion-segment-button value="roles">
+      <ion-label>ROLES</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="manage-roles">
+      <ion-label>MANAGE ROLES</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="members">
+      <ion-label>MEMBERS</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Default content for the "ROLES" subsection -->
+  <div *ngIf="segment === 'roles'" class="roles-main">
+    <!-- Put your roles list / week selection / lineup preview here -->
+    <h3>Upcoming roles (example)</h3>
+    <p>Show the current week's lineup, or a list of future weeks — this is where your existing Roles UI goes.</p>
+  </div>
+
+  <!-- Router outlet for subpages (manage-roles, members) -->
+  <!-- When you navigate to /tabs/roles/manage-roles or /tabs/roles/members, those pages render here -->
+  <router-outlet></router-outlet>
+</ion-content>

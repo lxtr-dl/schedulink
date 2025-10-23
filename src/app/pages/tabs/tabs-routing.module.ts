@@ -18,6 +18,12 @@ const routes: Routes = [
         loadChildren: () => import('../schedule/schedule.module').then(m => m.SchedulePageModule)
       },
       // Add your other pages here as needed
+
+      {
+        path: 'roles',
+        loadChildren: () => import('../roles/roles.module').then(m => m.RolesPageModule)
+      },
+      
       {
         path: '',
         redirectTo: '/tabs/home',

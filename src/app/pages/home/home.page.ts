@@ -70,4 +70,8 @@ export class HomePage implements OnInit, OnDestroy { // 4. Implement OnInit/OnDe
         return 'medium';
     }
   }
+  async logout() {
+  await this.authService.logout();
+  }
+
 }

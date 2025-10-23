@@ -1,21 +1,21 @@
+// src/app/services/user.service.ts
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-import { User } from '../interfaces/user'; // 👈 Make sure this file exists
 import { SupabaseClient } from '@supabase/supabase-js';
-import { environment } from 'src/environments/environment'; // 👈 Needed for URL
+import { environment } from 'src/environments/environment';
+import { User } from '../interfaces/user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   private supabase: SupabaseClient;
-  private _currentUser: User | null = null;
 
   constructor(private authService: AuthService) {
     this.supabase = this.authService.getClient();
   }
 
-  // ✅ Fetch user profile from `users` table using uid
+  // ✅ Load currently logged-in user's full profile
   async loadCurrentUser() {
     const supaUser = await this.authService.getUser();
     if (!supaUser) throw new Error('User not found in auth.');
@@ -27,52 +27,35 @@ export class UserService {
       .single();
 
     if (error) throw error;
-
-    this._currentUser = data;
     return data;
   }
 
-  get currentUser(): User | null {
-    return this._currentUser;
-  }
-
-  isAdmin(): boolean {
-    return this._currentUser?.role?.some(r =>
-      ['music director', 'coordinator', 'worship leader'].includes(r.toLowerCase())
-    ) ?? false;
-  }
-
-  // ✅ Admin-only function to create new user via Supabase Edge Function
-  // In your UserService.ts
-
-  async createUserViaEdge(email: string, password: string, name: string, role: string[]) {
-    // REMOVE THIS BLOCK FOR TESTING PUBLIC ACCESS (Scenario B)
-    // const session = await this.authService.getSession();
-    // if (!session) {
-    //   throw new Error('Not authenticated');
-    // }
-
-    const response = await fetch(`${environment.supabaseUrl}/functions/v1/create-user`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // REMOVE THIS LINE FOR TESTING PUBLIC ACCESS (Scenario B)
-        // 'Authorization': `Bearer ${session.access_token}` // Authenticated admin
-      },
-      body: JSON.stringify({
-        email,
-        password,
-        name,
-        role
-      })
+  // ✅ Admin creates a new user (works directly with Supabase Auth)
+  async createUser(email: string, password: string, name: string, roles: string[], positions: string[]) {
+    // Create the user in Supabase Auth
+    const { data: authUser, error: authError } = await this.supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true
     });
 
-    const result = await response.json();
+    if (authError) throw authError;
 
-    if (!response.ok) {
-      throw new Error(result.error || 'Failed to create user');
-    }
+    const uid = authUser.user?.id;
 
-    return result;
+    // Then add their info to your custom "users" table
+    const { error: insertError } = await this.supabase
+      .from('users')
+      .insert({
+        uid,
+        name,
+        email,
+        role: roles,
+        position: positions
+      });
+
+    if (insertError) throw insertError;
+
+    return authUser;
   }
 }

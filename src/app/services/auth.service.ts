@@ -1,8 +1,15 @@
 // src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient, User, Session } from '@supabase/supabase-js';
+import { 
+  createClient, 
+  SupabaseClient, 
+  User, 
+  Session, 
+  AuthChangeEvent // Make sure AuthChangeEvent is imported
+} from '@supabase/supabase-js';
 import { environment } from 'src/environments/environment';
 import { BehaviorSubject } from 'rxjs';
+import { Router } from '@angular/router'; // Make sure Router is imported
 
 @Injectable({
   providedIn: 'root'
@@ -18,11 +25,22 @@ export class AuthService {
   public currentUserRoles$ = this.currentUserRoles.asObservable();
   public currentUserPositions$ = this.currentUserPositions.asObservable();
 
-  constructor() {
+  constructor(private router: Router) { // Make sure Router is injected
     this.supabase = createClient(
       environment.supabaseUrl,
       environment.supabaseKey
     );
+
+    // This listener handles redirects on SIGN_IN / SIGN_OUT
+    this.supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
+      if (event === 'SIGNED_IN') {
+        console.log('AuthService detected SIGNED_IN, redirecting...');
+        this.router.navigate(['/home']);
+      } else if (event === 'SIGNED_OUT') {
+        this.router.navigate(['/login']);
+      }
+    });
+
     // When the app loads, check if there's an existing session and load data
     this.loadUserDataOnStart();
   }
@@ -41,7 +59,8 @@ export class AuthService {
       email, password
     });
     if (error) throw error;
-    await this.loadUserData(); // Load data after successful login
+    // We await this, but the redirect is handled by the listener
+    await this.loadUserData(); 
     return data;
   }
 
@@ -79,7 +98,7 @@ export class AuthService {
   }
 
   // ======================================================
-  // YOUR ORIGINAL HELPER METHODS - KEEP THESE
+  // ALL YOUR HELPER METHODS THAT WERE MISSING
   // ======================================================
 
   // ✅ Get current session
@@ -105,7 +124,7 @@ export class AuthService {
   }
 
   // ======================================================
-  // YOUR CHECK METHODS - UPDATED FOR BEHAVIORSUBJECT
+  // YOUR CHECK METHODS
   // ======================================================
 
   hasRole(role: string): boolean {
