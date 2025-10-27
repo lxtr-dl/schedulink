@@ -1,34 +1,42 @@
 import { Injectable } from '@angular/core';
-// 1. Import CanActivate, not CanLoad
-import { CanActivate, Router, UrlTree } from '@angular/router';
+import { CanActivate, CanLoad, Router, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { map, take, filter } from 'rxjs/operators'; // Removed filter for now
 import { AuthService } from '../services/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
-// 2. Implement CanActivate
-export class AuthGuard implements CanActivate { 
+export class AuthGuard implements CanActivate, CanLoad {
 
   constructor(
     private authService: AuthService,
     private router: Router
   ) { }
 
-  // 3. This function is now canActivate()
-  canActivate(): Observable<boolean | UrlTree> { 
-    // Use the new isAuthenticated$ observable from your AuthService
+  private checkAuth(): Observable<boolean | UrlTree> {
+    console.log('AuthGuard: checkAuth() running...'); 
     return this.authService.isAuthenticated$.pipe(
-      take(1), // Take the first value and complete
+      filter(isAuth => isAuth !== null && isAuth !== undefined), // Add filter back
+      take(1), 
       map(isAuthenticated => {
+        console.log(`AuthGuard: isAuthenticated$ emitted: ${isAuthenticated}`); 
         if (isAuthenticated) {
-          return true; // User is logged in, allow access
+          console.log('AuthGuard: Access granted.'); 
+          return true; 
         } else {
-          // User is not logged in, redirect to login
+          console.log('AuthGuard: Access DENIED, redirecting to login.'); 
           return this.router.createUrlTree(['/login']);
         }
       })
     );
+  }
+
+  canActivate(): Observable<boolean | UrlTree> {
+    return this.checkAuth();
+  }
+
+  canLoad(): Observable<boolean | UrlTree> {
+    return this.checkAuth();
   }
 }

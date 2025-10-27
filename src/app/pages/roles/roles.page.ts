@@ -1,43 +1,57 @@
 // src/app/pages/roles/roles.page.ts
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router'; // Import NavigationEnd
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular'; // For all ion-* elements
-import { RouterModule } from '@angular/router'; // For <router-outlet>
+import { IonicModule } from '@ionic/angular';
+import { RouterModule } from '@angular/router';
+import { AuthService } from 'src/app/services/auth.service';
+import { filter } from 'rxjs/operators'; // Import filter operator
+import { Subscription } from 'rxjs'; // Import Subscription
 
 @Component({
   selector: 'app-roles',
   templateUrl: './roles.page.html',
   styleUrls: ['./roles.page.scss'],
   standalone: true,
-  imports: [
-    CommonModule, 
-    IonicModule, 
-    RouterModule
-  ]
+  imports: [ CommonModule, IonicModule, RouterModule ]
 })
-export class RolesPage implements OnInit {
-  segment = 'roles'; // default
+export class RolesPage implements OnInit, OnDestroy { // Add OnDestroy
+  segment = 'roles'; 
+  private routerSubscription: Subscription | null = null; // For cleanup
 
-  constructor(private router: Router, private route: ActivatedRoute) {}
+  constructor(
+    private router: Router, 
+    private route: ActivatedRoute,
+    public authService: AuthService
+  ) {}
 
   ngOnInit() {
-    // if user navigated directly to a child path, set the segment accordingly
-    const path = this.route.snapshot.routeConfig?.path || '';
-    // nothing special — we rely on router navigation below
+    // ✅ FIX: Listen to router events to set the active segment
+    this.routerSubscription = this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      // Get the last part of the URL
+      const urlSegments = event.urlAfterRedirects.split('/');
+      const lastSegment = urlSegments[urlSegments.length - 1];
+      
+      // Check if the last segment matches known values, otherwise default to 'roles'
+      if (['manage-roles', 'members'].includes(lastSegment)) {
+        this.segment = lastSegment;
+      } else {
+        this.segment = 'roles'; // Default if on /tabs/roles
+      }
+    });
   }
 
-  async segmentChanged(ev: CustomEvent) {
-    const val = ev.detail.value;
-    this.segment = val;
-
-    if (val === 'roles') {
-      // navigate to base path /tabs/roles (keeps roles content visible)
-      await this.router.navigate(['/tabs/roles']);
-    } else if (val === 'manage-roles') {
-      await this.router.navigate(['/tabs/roles/manage-roles']);
-    } else if (val === 'members') {
-      await this.router.navigate(['/tabs/roles/members']);
+  ngOnDestroy() { // Add this for cleanup
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
     }
+  }
+
+  // ✅ FIX: Simplify segmentChanged - only update the segment property
+  segmentChanged(ev: CustomEvent) {
+    this.segment = ev.detail.value;
+    // REMOVED the router.navigate calls
   }
 }

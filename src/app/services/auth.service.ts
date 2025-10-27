@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from '@angular/core'; // 1. Import NgZone
+import { Injectable, NgZone } from '@angular/core';
 import {
   createClient,
   SupabaseClient,
@@ -27,7 +27,9 @@ export class AuthService {
   private isAuthenticated = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticated.asObservable();
 
-  // 2. Inject NgZone in the constructor
+  // 1. REMOVE the flag
+  // private initialAuthComplete = false; 
+
   constructor(private router: Router, private zone: NgZone) { 
     this.supabase = createClient(
       environment.supabaseUrl,
@@ -35,59 +37,66 @@ export class AuthService {
     );
 
     this.supabase.auth.onAuthStateChange(async (event, session) => {
-      // 3. Wrap the logic inside this.zone.run()
-      // This forces Angular to see the changes.
+      console.log(`AuthService Listener: Event received - ${event}`); 
+
       this.zone.run(async () => {
         if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
           if (session) {
+            console.log(`AuthService Listener: Handling ${event} with session.`);
             try {
               await this.loadUserProfile(session.user);
             } catch (error) {
-              console.error('Failed to load user profile in listener:', error);
+              console.error('AuthService Listener: Failed to load user profile:', error);
             }
 
             this.isAuthenticated.next(true);
 
+            // 2. SIMPLIFIED FIX: Only redirect if the specific event is SIGNED_IN
             if (event === 'SIGNED_IN') {
-              this.router.navigate(['/tabs/home']); // This is your correct path
+               console.log(`AuthService Listener: Redirecting to /tabs/home due to SIGNED_IN.`);
+               this.router.navigate(['/tabs/home']); 
+            } else {
+               console.log(`AuthService Listener: Not redirecting (${event}).`);
             }
+            
+          } else {
+             console.log(`AuthService Listener: ${event} event, but no session found.`);
+             // Reset state if session becomes invalid
+             this.currentUser.next(null);
+             this.isAuthenticated.next(false);
           }
         } else if (event === 'SIGNED_OUT') {
-          this.currentUser.next(null);
-          this.isAuthenticated.next(false);
-          this.router.navigate(['/login']);
+           console.log(`AuthService Listener: Handling SIGNED_OUT, redirecting to login.`);
+           this.currentUser.next(null);
+           this.isAuthenticated.next(false);
+           this.router.navigate(['/login']);
         }
       });
     });
   }
 
-  // ... (The rest of your file is PERFECT, no more changes needed) ...
+  // ... (Rest of your AuthService is fine) ...
 
   async loadUserProfile(authUser: User) {
     if (!authUser) return;
-
     try {
       const { data, error } = await this.supabase
         .from('users')
         .select('*')
         .eq('uid', authUser.id)
         .single();
-
-      if (error) throw error; // This error will be caught by the listener
+      if (error) throw error; 
+      console.log('AuthService: Loaded profile data:', data); // Keep this log
       this.currentUser.next(data as AppUser);
-
     } catch (error) {
       console.error('Error loading user profile:', error);
       this.currentUser.next(null);
-      throw error; // Re-throw to be caught by the listener
+      throw error; 
     }
   }
 
   async login(email: string, password: string) {
-    const { data, error } = await this.supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
     return data;
   }
@@ -96,37 +105,12 @@ export class AuthService {
     await this.supabase.auth.signOut();
   }
 
-  private getRoles(): string[] {
-    return this.currentUser.getValue()?.role || [];
-  }
-  
-  public can(allowedRoles: string[]): boolean {
-    const userRoles = this.getRoles();
-    return userRoles.some(role => allowedRoles.includes(role));
-  }
-  
-  public hasRole(role: string): boolean {
-    return this.getRoles().includes(role);
-  }
-  
-  public isAdmin(): boolean {
-    return this.can(['Music Director', 'Admin']);
-  }
-  
-  public canPostAnnouncement(): boolean {
-    return this.can(['Music Director', 'Admin', 'Worship Leader']);
-  }
-  
-  getClient() {
-    return this.supabase;
-  }
-  
-  public getCurrentUser(): AppUser | null {
-    return this.currentUser.getValue();
-  }
-  
-  async getAuthUser(): Promise<User | null> {
-    const { data } = await this.supabase.auth.getUser();
-    return data.user;
-  }
+  private getRoles(): string[] { return this.currentUser.getValue()?.role || []; }
+  public can(allowedRoles: string[]): boolean { const userRoles = this.getRoles(); return userRoles.some(role => allowedRoles.includes(role)); }
+  public hasRole(role: string): boolean { return this.getRoles().includes(role); }
+  public isAdmin(): boolean { return this.can(['Music Director', 'Admin']); }
+  public canPostAnnouncement(): boolean { return this.can(['Music Director', 'Admin', 'Worship Leader']); }
+  getClient() { return this.supabase; }
+  public getCurrentUser(): AppUser | null { return this.currentUser.getValue(); }
+  async getAuthUser(): Promise<User | null> { const { data } = await this.supabase.auth.getUser(); return data.user; }
 }
