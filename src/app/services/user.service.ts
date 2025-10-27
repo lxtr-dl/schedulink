@@ -1,9 +1,6 @@
-// src/app/services/user.service.ts
 import { Injectable } from '@angular/core';
-import { AuthService } from './auth.service';
+import { AuthService, AppUser } from './auth.service'; // <-- Import AppUser
 import { SupabaseClient } from '@supabase/supabase-js';
-import { environment } from 'src/environments/environment';
-import { User } from '../interfaces/user';
 
 @Injectable({
   providedIn: 'root'
@@ -15,10 +12,16 @@ export class UserService {
     this.supabase = this.authService.getClient();
   }
 
-  // ✅ Load currently logged-in user's full profile
-  async loadCurrentUser() {
-    const supaUser = await this.authService.getUser();
-    if (!supaUser) throw new Error('User not found in auth.');
+  /**
+   * Loads the full app profile for the currently logged-in user.
+   */
+  async loadCurrentUser(): Promise<AppUser | null> {
+    // FIX: The function is now called 'getAuthUser'
+    const supaUser = await this.authService.getAuthUser(); 
+    if (!supaUser) {
+      console.log('No auth user found, cannot load profile.');
+      return null;
+    }
 
     const { data, error } = await this.supabase
       .from('users')
@@ -26,36 +29,58 @@ export class UserService {
       .eq('uid', supaUser.id)
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error loading current user profile:', error);
+      return null;
+    }
+    
     return data;
   }
 
-  // ✅ Admin creates a new user (works directly with Supabase Auth)
-  async createUser(email: string, password: string, name: string, roles: string[], positions: string[]) {
-    // Create the user in Supabase Auth
-    const { data: authUser, error: authError } = await this.supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true
+  /**
+   * Gets all users from the 'users' table (for admin lists).
+   */
+  async getAllUsers() {
+    const { data, error } = await this.supabase
+      .from('users')
+      .select('*')
+      .order('name', { ascending: true });
+
+    if (error) {
+      console.error('Error getting all users:', error);
+      throw error;
+    }
+    return data;
+  }
+
+  /**
+   * Calls the Edge Function to create a new user/member.
+   * This is called by members.page.ts
+   */
+  async addUser(newMember: any) {
+    
+    // This log is important for debugging in your BROWSER console (F12)
+    console.log('UserService: Calling function "create-member" with payload:', newMember);
+
+    const { data, error } = await this.supabase.functions.invoke('register-member', {
+      body: {
+        email: newMember.email,
+        password: newMember.password,
+        name: newMember.name,
+        roles: newMember.roles // This is the array of role strings
+      }
     });
 
-    if (authError) throw authError;
-
-    const uid = authUser.user?.id;
-
-    // Then add their info to your custom "users" table
-    const { error: insertError } = await this.supabase
-      .from('users')
-      .insert({
-        uid,
-        name,
-        email,
-        role: roles,
-        position: positions
-      });
-
-    if (insertError) throw insertError;
-
-    return authUser;
+    if (error) {
+      console.error('UserService: Error invoking function:', error);
+      return { success: false, error: error };
+    }
+    
+    console.log('UserService: Function returned success:', data);
+    return { success: true, data: data };
   }
+
+  // NOTE: I have removed the old 'createUser' function.
+  // It was calling 'supabase.auth.admin.createUser', which fails from the app.
+  // The 'addUser' function above is the correct one to use.
 }

@@ -1,7 +1,6 @@
 <ion-header>
   <ion-toolbar color="light">
     <ion-title class="ion-text-center">Upcoming Schedule</ion-title>
-    <!-- ✅ Logout button (temporary) -->
     <ion-buttons slot="end">
       <ion-button (click)="logout()">
         <ion-icon name="log-out-outline"></ion-icon>
@@ -12,7 +11,6 @@
 
 <ion-content class="ion-padding">
 
-  <!-- Schedule Card -->
   <ion-card class="schedule-card">
     <ion-card-header>
       <ion-card-title>Sunday, June X</ion-card-title>
@@ -28,7 +26,6 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- Rehearsal Info -->
   <ion-card class="rehearsal-card">
     <ion-card-header>
       <ion-card-title>Rehearsal Day</ion-card-title>
@@ -42,10 +39,12 @@
 
   <div class="role-info">
     <div *ngIf="authService.isAdmin()">Welcome, Admin!</div>
-    <div *ngIf="authService.isWorshipLeader()">Welcome, Worship Leader!</div>
-    <div *ngIf="authService.hasRole('member')">Welcome, Member!</div>
-    <div *ngIf="authService.hasPosition('main keyboard')">You play Main Keyboard.</div>
-  </div>
 
+    <div *ngIf="authService.hasRole('Worship Leader')">Welcome, Worship Leader!</div>
+
+    <div *ngIf="authService.hasRole('Backup')">Welcome, Member!</div>
+
+    <div *ngIf="authService.hasRole('Main Keyboard')">You play Main Keyboard.</div>
+  </div>
 
 </ion-content>

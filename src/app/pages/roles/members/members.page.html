@@ -1,13 +1,66 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>members</ion-title>
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-title class="ion-text-center">Members</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">members</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Add New Member</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="floating">Full Name</ion-label>
+        <ion-input [(ngModel)]="newMember.name" type="text"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Email</ion-label>
+        <ion-input [(ngModel)]="newMember.email" type="email"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Password</ion-label>
+        <ion-input [(ngModel)]="newMember.password" type="password"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>Roles</ion-label>
+      </ion-item>
+
+      <ion-list>
+        <ion-item *ngFor="let role of availableRoles">
+          <ion-checkbox
+            slot="start"
+            [(ngModel)]="role.selected"
+            ></ion-checkbox>
+          <ion-label>{{ role.name }}</ion-label> </ion-item>
+      </ion-list>
+
+      <ion-button expand="block" color="primary" (click)="addMember()">
+        Add Member
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Current Members</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let member of members">
+          <ion-label>
+            <h2>{{ member.name }}</h2>
+            <p>{{ member.email }}</p>
+            <small>Roles: {{ member.roles?.join(', ') || '—' }}</small>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

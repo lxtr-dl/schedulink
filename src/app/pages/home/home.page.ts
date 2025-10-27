@@ -1,21 +1,21 @@
-// 1. Import OnInit
-import { Component, OnInit, OnDestroy } from '@angular/core'; 
+// 1. Import OnInit, OnDestroy
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from 'src/app/services/auth.service';
-import { Subscription } from 'rxjs'; // 2. Import Subscription
+// 2. Import AuthService AND the AppUser interface
+import { AuthService, AppUser } from 'src/app/services/auth.service';
+import { Subscription } from 'rxjs'; // 3. Import Subscription
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  standalone: true, // ✅ 3. Add standalone: true
-  imports: [ IonicModule, CommonModule, FormsModule ]
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule],
 })
-export class HomePage implements OnInit, OnDestroy { // 4. Implement OnInit/OnDestroy
-
-  // ✅ 5. Move lineup to be a class property
+export class HomePage implements OnInit, OnDestroy {
+  // ✅ Your lineup property
   lineup = [
     { role: 'Worship Leader', status: 'confirmed' },
     { role: 'Backup 3/5', status: 'confirmed' },
@@ -28,36 +28,38 @@ export class HomePage implements OnInit, OnDestroy { // 4. Implement OnInit/OnDe
     { role: 'Multimedia', status: 'confirmed' },
   ];
 
-  // Properties to hold your data
-  userRoles: string[] = [];
-  userPositions: string[] = [];
+  // ✅ Property to hold the full user profile
+  currentUser: AppUser | null = null;
   private subscriptions = new Subscription();
 
+  // Make authService public so your template can use it
   constructor(public authService: AuthService) {}
 
   ngOnInit() {
-    // ✅ 6. Subscribe to the observables to get the data
+    // ✅ 4. THIS IS THE FIX
+    // Subscribe to the new, single 'currentUser$' observable
     this.subscriptions.add(
-      this.authService.currentUserRoles$.subscribe(roles => {
-        this.userRoles = roles;
-        console.log('Loaded Roles:', this.userRoles);
+      this.authService.currentUser$.subscribe((user) => {
+        // 'user' is the entire AppUser object (or null)
+        this.currentUser = user;
+        console.log('Loaded User Profile:', this.currentUser);
+
+        // You can get the roles from the user object if needed
+        const roles = user ? user.role : [];
+        console.log('Loaded Roles:', roles);
       })
     );
-    
-    this.subscriptions.add(
-      this.authService.currentUserPositions$.subscribe(positions => {
-        this.userPositions = positions;
-        console.log('Loaded Positions:', this.userPositions);
-      })
-    );
+
+    // We no longer need to subscribe to 'currentUserPositions$'
+    // because you deleted that column.
   }
 
   ngOnDestroy() {
-    // 7. Unsubscribe to prevent memory leaks
+    // 5. Unsubscribe to prevent memory leaks
     this.subscriptions.unsubscribe();
   }
 
-  // ✅ 8. Move getBadgeColor to be a class method
+  // ✅ Your getBadgeColor method
   getBadgeColor(status: string): string {
     switch (status) {
       case 'confirmed':
@@ -70,8 +72,9 @@ export class HomePage implements OnInit, OnDestroy { // 4. Implement OnInit/OnDe
         return 'medium';
     }
   }
-  async logout() {
-  await this.authService.logout();
-  }
 
+  // ✅ Your logout method
+  async logout() {
+    await this.authService.logout();
+  }
 }

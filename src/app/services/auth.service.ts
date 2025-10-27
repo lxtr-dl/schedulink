@@ -1,146 +1,132 @@
-// src/app/services/auth.service.ts
-import { Injectable } from '@angular/core';
-import { 
-  createClient, 
-  SupabaseClient, 
-  User, 
-  Session, 
-  AuthChangeEvent // Make sure AuthChangeEvent is imported
+import { Injectable, NgZone } from '@angular/core'; // 1. Import NgZone
+import {
+  createClient,
+  SupabaseClient,
+  User,
+  Session,
+  AuthChangeEvent,
 } from '@supabase/supabase-js';
 import { environment } from 'src/environments/environment';
 import { BehaviorSubject } from 'rxjs';
-import { Router } from '@angular/router'; // Make sure Router is imported
+import { Router } from '@angular/router';
+
+export interface AppUser {
+  uid: string;
+  name: string;
+  email: string;
+  role: string[];
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private supabase: SupabaseClient;
+  private currentUser = new BehaviorSubject<AppUser | null>(null);
+  public currentUser$ = this.currentUser.asObservable();
+  private isAuthenticated = new BehaviorSubject<boolean>(false);
+  public isAuthenticated$ = this.isAuthenticated.asObservable();
 
-  // Use BehaviorSubjects to hold and broadcast data
-  private currentUserRoles = new BehaviorSubject<string[]>([]);
-  private currentUserPositions = new BehaviorSubject<string[]>([]);
-
-  // Create public observables for components to subscribe to
-  public currentUserRoles$ = this.currentUserRoles.asObservable();
-  public currentUserPositions$ = this.currentUserPositions.asObservable();
-
-  constructor(private router: Router) { // Make sure Router is injected
+  // 2. Inject NgZone in the constructor
+  constructor(private router: Router, private zone: NgZone) { 
     this.supabase = createClient(
       environment.supabaseUrl,
       environment.supabaseKey
     );
 
-    // This listener handles redirects on SIGN_IN / SIGN_OUT
-    this.supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
-      if (event === 'SIGNED_IN') {
-        console.log('AuthService detected SIGNED_IN, redirecting...');
-        this.router.navigate(['/home']);
-      } else if (event === 'SIGNED_OUT') {
-        this.router.navigate(['/login']);
-      }
-    });
+    this.supabase.auth.onAuthStateChange(async (event, session) => {
+      // 3. Wrap the logic inside this.zone.run()
+      // This forces Angular to see the changes.
+      this.zone.run(async () => {
+        if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+          if (session) {
+            try {
+              await this.loadUserProfile(session.user);
+            } catch (error) {
+              console.error('Failed to load user profile in listener:', error);
+            }
 
-    // When the app loads, check if there's an existing session and load data
-    this.loadUserDataOnStart();
+            this.isAuthenticated.next(true);
+
+            if (event === 'SIGNED_IN') {
+              this.router.navigate(['/tabs/home']); // This is your correct path
+            }
+          }
+        } else if (event === 'SIGNED_OUT') {
+          this.currentUser.next(null);
+          this.isAuthenticated.next(false);
+          this.router.navigate(['/login']);
+        }
+      });
+    });
   }
 
-  // Helper to load data on app start
-  private async loadUserDataOnStart() {
-    const { data: { session } } = await this.supabase.auth.getSession();
-    if (session) {
-      await this.loadUserData();
+  // ... (The rest of your file is PERFECT, no more changes needed) ...
+
+  async loadUserProfile(authUser: User) {
+    if (!authUser) return;
+
+    try {
+      const { data, error } = await this.supabase
+        .from('users')
+        .select('*')
+        .eq('uid', authUser.id)
+        .single();
+
+      if (error) throw error; // This error will be caught by the listener
+      this.currentUser.next(data as AppUser);
+
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+      this.currentUser.next(null);
+      throw error; // Re-throw to be caught by the listener
     }
   }
 
-  // ✅ Login
   async login(email: string, password: string) {
     const { data, error } = await this.supabase.auth.signInWithPassword({
-      email, password
+      email,
+      password,
     });
     if (error) throw error;
-    // We await this, but the redirect is handled by the listener
-    await this.loadUserData(); 
     return data;
   }
 
-  // ✅ Logout
   async logout() {
     await this.supabase.auth.signOut();
-    // Clear the data on logout
-    this.currentUserRoles.next([]);
-    this.currentUserPositions.next([]);
   }
 
-  // ✅ Load roles and positions
-  async loadUserData() {
-    const { data: { user } } = await this.supabase.auth.getUser();
-    if (!user) {
-      return; // No user, nothing to load
-    }
-
-    const { data: userProfile, error } = await this.supabase
-      .from('users')
-      .select('role, position') // Only select what you need
-      .eq('uid', user.id)
-      .single();
-
-    if (error || !userProfile) {
-      console.error('User profile load error:', error);
-      this.currentUserRoles.next([]); // Broadcast empty array on error
-      this.currentUserPositions.next([]);
-      return;
-    }
-
-    // Broadcast the new data to all subscribers
-    this.currentUserRoles.next(userProfile.role || []);
-    this.currentUserPositions.next(userProfile.position || []);
+  private getRoles(): string[] {
+    return this.currentUser.getValue()?.role || [];
   }
-
-  // ======================================================
-  // ALL YOUR HELPER METHODS THAT WERE MISSING
-  // ======================================================
-
-  // ✅ Get current session
-  async getSession(): Promise<Session | null> {
-    const { data } = await this.supabase.auth.getSession();
-    return data.session;
+  
+  public can(allowedRoles: string[]): boolean {
+    const userRoles = this.getRoles();
+    return userRoles.some(role => allowedRoles.includes(role));
   }
-
-  // ✅ Get current user
-  async getUser(): Promise<User | null> {
-    const { data } = await this.supabase.auth.getUser();
-    return data.user;
+  
+  public hasRole(role: string): boolean {
+    return this.getRoles().includes(role);
   }
-
-  // ✅ Optional: Listen for auth state changes
-  onAuthChange(callback: (event: string, session: any) => void) {
-    return this.supabase.auth.onAuthStateChange(callback);
+  
+  public isAdmin(): boolean {
+    return this.can(['Music Director', 'Admin']);
   }
-
-  // 🔐 Expose supabase client if needed by other services
+  
+  public canPostAnnouncement(): boolean {
+    return this.can(['Music Director', 'Admin', 'Worship Leader']);
+  }
+  
   getClient() {
     return this.supabase;
   }
-
-  // ======================================================
-  // YOUR CHECK METHODS
-  // ======================================================
-
-  hasRole(role: string): boolean {
-    // Use getValue() to get the current array from the BehaviorSubject
-    return this.currentUserRoles.getValue().includes(role);
+  
+  public getCurrentUser(): AppUser | null {
+    return this.currentUser.getValue();
   }
-
-  hasPosition(position: string): boolean {
-    return this.currentUserPositions.getValue().includes(position);
-  }
-
-  isAdmin(): boolean {
-    return this.hasRole('music_director') || this.hasRole('coordinator');
-  }
-
-  isWorshipLeader(): boolean {
-    return this.hasRole('worship_leader');
+  
+  async getAuthUser(): Promise<User | null> {
+    const { data } = await this.supabase.auth.getUser();
+    return data.user;
   }
 }
