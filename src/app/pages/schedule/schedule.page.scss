@@ -1,14 +1,146 @@
-ion-card {
-  margin: 12px;
+// Define your primary color if not already globally defined
+:host {
+  --ion-color-primary: #510662;
+  --ion-color-primary-rgb: 81,6,98;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255,255,255;
+  --ion-color-primary-shade: #470557;
+  --ion-color-primary-tint: #621f73; // Lighter tint for inactive weeks
 }
-ion-card-header {
-  background: #430066; // Your purple color
-  color: white;
-  border-radius: 8px 8px 0 0;
+
+ion-content {
+  --background: #f4f5f8; // Light gray background
 }
-.rehearsal-card {
-  background-color: #430066;
-  color: white;
-  margin-top: 10px;
-  border-radius: 10px;
+
+// Add spacing below the header
+.content-spacing {
+  height: 10px;
+}
+
+// Container for each week's section
+.week-container {
+  margin: 0 12px 16px 12px; // Add left/right margin
+  background: var(--ion-color-step-50, #ffffff);
+  border-radius: 8px; // Rounded corners for the whole container
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: opacity 0.3s ease-in-out; // Smooth transition
+}
+
+// Style the clickable week header item
+.week-header {
+  --background: var(--ion-color-primary); // Active color (your purple #510662)
+  --color: var(--ion-color-primary-contrast); // White text
+  font-weight: bold;
+  --border-radius: 0; // Remove item's rounding, container handles it
+  --inner-padding-bottom: 8px; // Adjust padding
+  --inner-padding-top: 8px;
+  transition: background-color 0.3s ease-in-out; // Smooth transition for color change
+
+  h2 {
+    font-size: 1.1em;
+    margin: 0 0 4px 0; // Space below date
+    padding-left: 8px; // Align with preview items
+  }
+
+  ion-icon {
+    font-size: 1.2em;
+    color: var(--ion-color-primary-contrast-rgb, 255, 255, 255, 0.7);
+  }
+
+  // Styling for the role preview section (visible when collapsed)
+  .role-preview {
+    width: 100%; // Take full width
+
+    ion-item {
+      --background: transparent; // Make item background transparent
+      --color: var(--ion-color-primary-contrast); // White text
+      --inner-padding-start: 8px;
+      --inner-padding-end: 8px;
+      --min-height: 28px; // Make preview items shorter
+      font-size: 0.9em;
+      font-weight: normal; // Normal weight for preview
+
+      ion-badge {
+        font-size: 0.7em;
+        padding: 4px 6px;
+        margin-left: 5px; // Space between label and badge
+      }
+    }
+  }
+
+  // Specific styles when expanded (optional)
+  &.expanded {
+    --inner-padding-bottom: 12px;
+    --inner-padding-top: 12px;
+    h2 {
+      padding-left: 0; // Reset padding when expanded if needed
+      margin-bottom: 0;
+    }
+  }
+}
+
+// ✅ STYLES FOR INACTIVE WEEKS
+.inactive-week {
+  // Option 1: Reduce opacity (makes everything slightly transparent)
+  // opacity: 0.7;
+
+  // Option 2: Change the header background color (more specific)
+  .week-header {
+    // Use the lighter tint of your primary color
+    --background: var(--ion-color-primary-tint, #621f73);
+    // Or you could use a gray color instead:
+    // --background: var(--ion-color-medium-tint);
+  }
+}
+
+// Style the expanded content area
+.week-content {
+  padding: 0;
+
+  .assignments-list {
+     margin-bottom: 0;
+  }
+
+  .assignment-item {
+    --inner-padding-end: 8px;
+    --padding-start: 16px;
+    h3 { font-weight: 500; font-size: 1em; margin-bottom: 2px; }
+    p.assigned-persons { font-size: 0.85em; color: var(--ion-color-medium-shade); white-space: normal; }
+    ion-badge { font-size: 0.75em; padding: 5px 8px; }
+  }
+}
+
+// Styling for the rehearsal section
+.rehearsal-section {
+  margin-top: 8px; // Space above the rehearsal divider
+
+  ion-item-divider {
+    --background: var(--ion-color-light); // Light background for divider
+    --color: var(--ion-color-dark-tint);
+    min-height: 30px;
+    font-size: 0.9em;
+  }
+
+  ion-item {
+    --padding-start: 16px;
+    --inner-padding-end: 16px;
+    --min-height: 40px;
+    font-size: 0.9em;
+
+    ion-icon {
+      margin-right: 10px; // Space between icon and text
+    }
+
+    p {
+      margin: 0;
+      color: var(--ion-color-medium-shade);
+      strong {
+         color: var(--ion-color-dark-tint);
+      }
+      i { // Style for "Time TBD"
+        color: var(--ion-color-medium);
+      }
+    }
+  }
 }
