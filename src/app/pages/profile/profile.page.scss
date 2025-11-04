@@ -1,0 +1,60 @@
+// Remove default header shadow/border
+ion-header {
+  &.profile-header-container {
+    --background: var(--ion-color-primary, #510662);
+    color: var(--ion-color-primary-contrast, #ffffff);
+    
+    ion-toolbar {
+      --background: transparent;
+      --border-width: 0;
+    }
+  }
+  // Remove shadow on content when scrolled
+  &::after {
+    display: none;
+  }
+}
+
+// Container for avatar, name, roles
+.profile-info {
+  background: var(--ion-color-primary, #510662);
+  color: var(--ion-color-primary-contrast, #ffffff);
+  width: 100%;
+  text-align: center;
+  padding: 16px;
+  padding-top: 0;
+
+  ion-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    
+    ion-icon {
+      font-size: 50px;
+      color: white;
+    }
+    // For later
+    img {
+      object-fit: cover;
+    }
+  }
+
+  h2 {
+    font-size: 1.4em;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  p {
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 4px 0 0;
+  }
+}
+
+// Style the list
+ion-list {
+  padding-top: 8px;
+}

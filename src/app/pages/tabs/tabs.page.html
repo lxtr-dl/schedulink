@@ -1,4 +1,28 @@
-<ion-tabs>
+<!-- ✅ 1. ADD THE SHARED HEADER -->
+<ion-header>
+  <ion-toolbar color="primary">
+    <!-- This title will change based on the active tab -->
+    <ion-title>{{ pageTitle }}</ion-title>
+
+    <ion-buttons slot="end">
+      <!-- This button navigates to the profile page -->
+      <ion-button (click)="goToProfile()" class="profile-button">
+        <ion-avatar class="profile-avatar">
+          <!-- 
+            This is a placeholder. 
+            Later, you'll replace this icon with:
+            <img [src]="currentUser?.avatar_url" *ngIf="currentUser?.avatar_url" />
+          -->
+          <ion-icon name="person-outline" color="primary-contrast"></ion-icon>
+        </ion-avatar>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<!-- ✅ 2. ADD THE (ionTabsDidChange) EVENT -->
+<!-- This event tells the .ts file which tab is active -->
+<ion-tabs (ionTabsDidChange)="handleTabsDidChange($event)">
   <ion-tab-bar slot="bottom" color="primary">
     <ion-tab-button tab="home">
       <ion-icon name="home-outline"></ion-icon>

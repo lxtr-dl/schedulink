@@ -1,0 +1,29 @@
+// Make the button itself clean
+.profile-button {
+  --padding-start: 0;
+  --padding-end: 10px; // Space on the right
+}
+
+// Style the avatar to be a small circle
+.profile-avatar {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2); // Placeholder background
+  border-radius: 50%; // Make it round
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.3); // Subtle border
+
+  ion-icon {
+    font-size: 20px;
+    color: var(--ion-color-primary-contrast); // White
+  }
+
+  // This is for later, when you have a real profile image
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}

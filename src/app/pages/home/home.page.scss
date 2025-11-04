@@ -1,3 +1,7 @@
+ion-content {
+  --padding-top: calc(env(safe-area-inset-top) + var(--ion-toolbar-height, 56px));
+}
+
 .schedule-card, .rehearsal-card {
   background: #5e0c77; // deep purple
   color: white;

@@ -16,7 +16,7 @@ import { RefresherCustomEvent } from '@ionic/angular';
 export class SchedulePage {
   schedules: WeeklySchedule[] = []; 
   expandedWeeks: string[] = [];
-  activeWeekDate: string | null = null; // ✅ 1. Property to hold the active week's date
+  activeWeekDate: string | null = null; 
 
   constructor(private router: Router) {
      this.loadInitialSchedules(); 
@@ -25,28 +25,23 @@ export class SchedulePage {
   loadInitialSchedules() {
      console.log('Loading initial schedules...');
      this.schedules = MOCK_SCHEDULES;
-     // ✅ 2. Determine the active week (using the first week for now)
      if (this.schedules.length > 0) {
        this.activeWeekDate = this.schedules[0].date; 
-       // Later, replace this with logic to find the current/closest week
      } else {
        this.activeWeekDate = null;
      }
   }
 
-  // ✅ 3. Helper function to check if a week is the active one
   isWeekActive(weekDate: string): boolean {
     return weekDate === this.activeWeekDate;
   }
 
   toggleWeek(date: string) {
-    // ... (keep existing logic)
     const index = this.expandedWeeks.indexOf(date);
     index > -1 ? this.expandedWeeks.splice(index, 1) : this.expandedWeeks.push(date);
   }
 
   getStatusColor(status: string): string {
-    // ... (keep existing logic)
      switch (status) {
       case 'confirmed': return 'success';
       case 'pending': return 'warning';
@@ -56,10 +51,8 @@ export class SchedulePage {
   }
 
   async handleRefresh(event: RefresherCustomEvent) {
-    // ... (keep existing logic)
      console.log('Refreshing schedules...');
      await this.fetchSchedulesFromBackend();
-     // ✅ Re-determine active week after refresh
      if (this.schedules.length > 0) {
        this.activeWeekDate = this.schedules[0].date; 
      } else {
@@ -69,7 +62,6 @@ export class SchedulePage {
   }
 
   async fetchSchedulesFromBackend() {
-    // ... (keep existing logic)
      return new Promise(resolve => {
        setTimeout(() => {
           console.log('Simulated fetch complete.');
@@ -79,7 +71,5 @@ export class SchedulePage {
     });
   }
 
-  goToProfile() {
-    // ... (keep existing logic)
-  }
+  // ✅ goToProfile() function has been removed.
 }

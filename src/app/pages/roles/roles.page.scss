@@ -1,0 +1,3 @@
+ion-content {
+  --padding-top: calc(env(safe-area-inset-top) + var(--ion-toolbar-height, 56px));
+}
