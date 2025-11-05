@@ -42,7 +42,7 @@ export class TabsPage implements OnDestroy {
         this.pageTitle = 'Roles & Volunteers';
         break;
       case 'music':
-        this.pageTitle = 'Songs';
+        this.pageTitle = 'Line-Up';
         break;
       case 'announcements':
         this.pageTitle = 'News';

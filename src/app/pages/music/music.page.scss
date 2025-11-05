@@ -1,0 +1,189 @@
+// --- Color Variables based on your Figma ---
+:host {
+  // Your main brand color
+  --app-color-primary: #510662; 
+
+  // Dark theme colors from Figma
+  --app-color-page-bg: #1c1c1e; // Very dark background
+  --app-color-card-bg: var(--app-color-primary); // Purple for the main card
+  --app-color-text-primary: #ffffff; // White
+  --app-color-text-secondary: rgba(255, 255, 255, 0.7); // Faded white for song titles
+  
+  // Segment colors from Figma
+  --app-color-segment-active-bg: var(--app-color-primary);
+  --app-color-segment-active-text: #ffffff;
+  --app-color-segment-inactive-bg: #f4f5f8; // Light gray for inactive
+  --app-color-segment-inactive-text: #1c1c1e; // Dark text for inactive
+
+  // Edit mode colors from Figma
+  --app-color-edit-input-bg: #6b2a82; // Lighter purple for inputs
+}
+
+
+// --- Page Setup ---
+ion-content {
+  // 1. Set the main page background to dark
+  --background: var(--app-color-page-bg);
+
+  // 2. Keep the padding fix for the shared header
+  --padding-top: calc(env(safe-area-inset-top) + var(--ion-toolbar-height, 56px));
+}
+
+// --- Segment Tabs ---
+.segment-tabs {
+  background: var(--app-color-page-bg); // Match page background
+  padding: 10px 12px; // Add spacing around the segments
+
+  ion-segment-button {
+    text-transform: none; // Keep text as "This Sunday"
+    font-weight: 600;
+    --border-radius: 8px;
+    --indicator-color: transparent; // Remove the bottom line
+    margin: 0 4px;
+
+    // 3. Style for INACTIVE tabs
+    --background: var(--app-color-segment-inactive-bg);
+    --color: var(--app-color-segment-inactive-text);
+
+    // 4. Style for ACTIVE tab
+    &.segment-button-checked {
+      --background: var(--app-color-segment-active-bg);
+      --color: var(--app-color-segment-active-text);
+    }
+  }
+}
+
+// --- Content Area ---
+.segment-content {
+  padding: 0 16px 16px 16px; // Spacing for the cards
+}
+
+// --- Main Lineup Card (View & Edit) ---
+.lineup-card,
+.edit-form-card {
+  background: var(--app-color-card-bg); // 5. Set card background to PURPLE
+  border-radius: 12px;
+  color: var(--app-color-text-primary); // White text
+  margin-top: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+// Card Headers (View & Edit)
+.lineup-card-header,
+.edit-card-header {
+  --background: transparent; // Header is part of the purple card
+  --color: var(--app-color-text-primary);
+  font-weight: 600;
+
+  h2 {
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+
+  // Make the edit icon white
+  ion-icon {
+    color: var(--app-color-text-primary);
+  }
+}
+
+// --- View Mode Specifics ---
+.lineup-item,
+.rehearsal-info {
+  --background: transparent;
+  --color: var(--app-color-text-primary);
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+}
+
+.lineup-category {
+  color: var(--app-color-text-primary);
+  font-weight: 600;
+  font-size: 1.1em;
+  margin-bottom: 8px;
+  
+  span { // (suggestion)
+    font-weight: 300;
+    font-size: 0.9em;
+    opacity: 0.8;
+  }
+}
+
+.lineup-song {
+  color: var(--app-color-text-secondary); // Faded white
+  font-size: 1em;
+  padding-left: 10px;
+  margin: 4px 0;
+  cursor: pointer; // Show it's clickable
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.rehearsal-info {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+  padding-top: 8px;
+
+  h3 {
+    font-weight: 600;
+    font-size: 1.1em;
+  }
+  p {
+    color: var(--app-color-text-secondary);
+    font-size: 1em;
+  }
+}
+
+
+// --- Edit Mode Specifics ---
+.edit-form-details {
+  padding-bottom: 8px;
+}
+
+.edit-item {
+  --background: transparent;
+  --color: var(--app-color-text-primary);
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+  
+  ion-label.lineup-category {
+    font-size: 1em;
+    margin-bottom: 0;
+  }
+
+  // 6. Style the inputs to match Figma
+  ion-select,
+  ion-input {
+    background: var(--app-color-edit-input-bg); // Lighter purple
+    color: var(--app-color-text-primary);
+    border-radius: 8px;
+    margin-top: 8px;
+    --padding-start: 12px;
+    --padding-end: 12px;
+    width: 100%;
+  }
+
+  ion-select::part(placeholder) {
+    color: var(--app-color-text-secondary);
+  }
+}
+
+// --- Placeholder Text (for other segments) ---
+.placeholder-text {
+  color: var(--ion-color-medium-shade);
+  text-align: center;
+  margin-top: 50px;
+}
+
+// --- Edit/Cancel Buttons ---
+ion-row {
+  ion-button[color="success"] {
+    --background: #2dd36f; // Brighter green
+    font-weight: 600;
+  }
+  ion-button[color="danger"] {
+    font-weight: 600;
+  }
+}

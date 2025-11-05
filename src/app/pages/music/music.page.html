@@ -1,0 +1,133 @@
+<!-- No header here, it's handled by tabs.page.html -->
+
+<ion-content>
+  <!-- Padding fix for shared header -->
+  <div class="content-padding-top"></div>
+
+  <!-- Segment for This Sunday / Past Services / Song Book -->
+  <ion-segment [(ngModel)]="selectedSegment" mode="md" class="segment-tabs">
+    <ion-segment-button value="this-sunday">
+      <ion-label>This Sunday</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="past-services">
+      <ion-label>Past Services</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="song-book">
+      <ion-label>Song Book</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- "THIS SUNDAY" CONTENT -->
+  <div *ngIf="selectedSegment === 'this-sunday'" class="segment-content">
+
+    <!-- =========== VIEW MODE ============ -->
+    <div *ngIf="!editMode" class="lineup-card">
+      <ion-item lines="none" class="lineup-card-header">
+        <ion-label>
+          <h2>{{ currentSundayLineUp.date }}</h2>
+        </ion-label>
+        
+        <!-- Edit Button (Only for scheduled WL) -->
+        <ion-buttons slot="end" *ngIf="isWorshipLeaderScheduled">
+          <ion-button (click)="toggleEditMode()">
+            <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-item>
+
+      <div class="lineup-details">
+        <!-- Loop through lineup categories -->
+        <ion-item *ngFor="let item of currentSundayLineUp.items" lines="none" class="lineup-item">
+          <ion-label>
+            <h3 class="lineup-category">
+              {{ item.category }}
+              <span *ngIf="item.suggestion">(suggestion)</span>
+            </h3>
+            <!-- Loop through songs in this category -->
+            <p *ngFor="let song of item.songs" class="lineup-song" (click)="onSongClick(song)">
+              {{ song.title }} 
+              <span *ngIf="song.artist">- {{ song.artist }}</span>
+            </p>
+          </ion-label>
+        </ion-item>
+
+        <!-- Rehearsal Info -->
+        <ion-item lines="none" class="rehearsal-info">
+          <ion-label>
+            <h3>Rehearsal Day:</h3>
+            <p>{{ currentSundayLineUp.rehearsalDay || 'TBD' }}</p>
+            <p>Time: {{ currentSundayLineUp.rehearsalTime || 'TBD' }}</p>
+          </ion-label>
+        </ion-item>
+      </div>
+    </div>
+    <!-- ======== END VIEW MODE ========== -->
+
+    
+    <!-- =========== EDIT MODE ============ -->
+    <div *ngIf="editMode" class="edit-form-card">
+      <ion-item lines="none" class="edit-card-header">
+        <ion-label>
+          <h2>Edit Line-Up: {{ currentSundayLineUp.date }}</h2>
+        </ion-label>
+      </ion-item>
+
+      <div class="edit-form-details">
+        <!-- Loop through editable lineup categories -->
+        <ion-item *ngFor="let item of editableLineUp.items" class="edit-item">
+          <ion-label position="stacked" class="lineup-category">
+            {{ item.category }}
+            <span *ngIf="item.suggestion">(suggestion)</span>
+          </ion-label>
+          
+          <!-- This would be a multi-song selector, but for now a simple select -->
+          <!-- We bind to item.songs[0].id for simplicity. You can change this later -->
+          <ion-select placeholder="Select Song" [(ngModel)]="item.songs[0].id" interface="action-sheet">
+            <ion-select-option *ngFor="let song of allSongs" [value]="song.id">
+              {{ song.title }} ({{ song.artist }})
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Edit Rehearsal Info -->
+        <ion-item class="edit-item">
+          <ion-label position="stacked">Rehearsal Day</ion-label>
+          <ion-input type="text" [(ngModel)]="editableLineUp.rehearsalDay"></ion-input>
+        </ion-item>
+        <ion-item class="edit-item">
+          <ion-label position="stacked">Rehearsal Time</ion-label>
+          <ion-input type="text" [(ngModel)]="editableLineUp.rehearsalTime"></ion-input>
+        </ion-item>
+        
+        <!-- Save/Cancel Buttons -->
+        <ion-row class="ion-padding-top ion-padding-horizontal">
+          <ion-col>
+            <ion-button (click)="onSaveLineUp()" expand="block" color="success">
+              <ion-icon slot="start" name="save-outline"></ion-icon>
+              Save Line-Up
+            </ion-button>
+          </ion-col>
+          <ion-col>
+            <ion-button (click)="onCancelEdit()" expand="block" fill="clear" color="danger">
+              Cancel
+            </ion-button>
+          </ion-col>
+        </ion-row>
+
+      </div>
+    </div>
+    <!-- ======== END EDIT MODE ========== -->
+
+  </div>
+
+  <!-- "PAST SERVICES" CONTENT -->
+  <div *ngIf="selectedSegment === 'past-services'" class="segment-content">
+    <p class="placeholder-text">Past Services list will go here.</p>
+  </div>
+
+  <!-- "SONG BOOK" CONTENT -->
+  <div *ngIf="selectedSegment === 'song-book'" class="segment-content">
+    <p class="placeholder-text">Searchable Song Book will go here.</p>
+  </div>
+
+</ion-content>

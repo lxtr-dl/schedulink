@@ -10,10 +10,20 @@ const routes: Routes = [
     component: TabsPage,
     // canActivate: [AuthGuard], // 2. REMOVE this line
     children: [
-      { path: 'home', loadChildren: () => import('../home/home.module').then(m => m.HomePageModule) },
-      { path: 'schedule', loadChildren: () => import('../schedule/schedule.module').then(m => m.SchedulePageModule) },
-      { path: 'roles', loadChildren: () => import('../roles/roles.module').then(m => m.RolesPageModule) },
-      // Add music/announcements paths here too
+      { 
+        path: 'home', loadChildren: () => import('../home/home.module').then(m => m.HomePageModule) 
+      },
+      { 
+        path: 'schedule', loadChildren: () => import('../schedule/schedule.module').then(m => m.SchedulePageModule) 
+      },
+      { 
+        path: 'roles', loadChildren: () => import('../roles/roles.module').then(m => m.RolesPageModule) 
+      },
+       {
+        path: 'music', // ✅ THIS IS THE FIX
+        // Use loadComponent for standalone pages
+        loadComponent: () => import('../music/music.page').then(m => m.MusicPage) 
+      },
       { path: '', redirectTo: '/tabs/home', pathMatch: 'full' }
     ]
   }
