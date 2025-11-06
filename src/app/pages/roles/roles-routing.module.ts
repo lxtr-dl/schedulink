@@ -1,4 +1,3 @@
-// src/app/pages/roles/roles-routing.module.ts
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { RolesPage } from './roles.page';
@@ -8,29 +7,39 @@ const routes: Routes = [
   {
     path: '',
     component: RolesPage,
-    // Define child routes WITHIN the parent RolesPage route
-    children: [ 
+    // ✅ 1. ADD THE 'children' ARRAY
+    // This tells Angular to load these pages inside the
+    // <router-outlet> of RolesPage.
+    children: [
       {
-        path: 'manage-roles', // Path is now relative to '/tabs/roles'
-        // ✅ FIX: Use canActivate array for standalone components
-        canActivate: [AdminGuard], 
+        path: 'manage-roles', // Path is now '/tabs/roles/manage-roles'
+        canActivate: [AdminGuard], // Use the guard we made
         loadChildren: () => import('./manage-roles/manage-roles.module').then( m => m.ManageRolesPageModule)
       },
       {
-        path: 'members', // Path is now relative to '/tabs/roles'
-        // ✅ FIX: Use canActivate array for standalone components
-        canActivate: [AdminGuard], 
+        path: 'members', // Path is now '/tabs/roles/members'
+        canActivate: [AdminGuard], // Use the guard we made
         loadChildren: () => import('./members/members.module').then( m => m.MembersPageModule)
-      },
-      // Optional: Add a default child route if needed when only '/tabs/roles' is visited
+      }
+      // ✅ 2. (OPTIONAL) Add a default child route
+      // This will make the "ROLES" content (from roles.page.html)
+      // load by default.
       // {
-      //   path: '', // Default child when path is exactly '/tabs/roles'
-      //   redirectTo: 'some-default-child', // Or load a default component
+      //   path: '',
+      //   redirectTo: 'roles-content', // This needs a component
       //   pathMatch: 'full'
       // }
     ]
   }
-  // REMOVED the separate paths for manage-roles and members, they are now children
+  // ⛔ 3. REMOVE the old, separate routes.
+  // {
+  //   path: 'manage-roles',
+  //   loadChildren: () => ...
+  // },
+  // {
+  //   path: 'members',
+  //   loadChildren: () => ...
+  // }
 ];
 
 @NgModule({

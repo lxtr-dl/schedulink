@@ -1,20 +1,80 @@
+<!-- (Your <ion-content> and <ion-segment> are correct and stay) -->
+<ion-content>
+  <div class="content-padding-top"></div>
 
-
-<ion-content class="ion-padding">
-  <ion-segment [value]="segment" (ionChange)="segmentChanged($event)">
+  <ion-segment 
+    [value]="segment" 
+    mode="md" 
+    class="segment-tabs"
+    [class.member-view]="!authService.isAdmin()">
     
     <ion-segment-button value="roles" [routerLink]="['/tabs/roles']">
       <ion-label>ROLES</ion-label>
     </ion-segment-button>
 
-    <ion-segment-button *ngIf="authService.isAdmin()" value="manage-roles" [routerLink]="['/tabs/roles/manage-roles']">
+    <ion-segment-button 
+      value="manage-roles" 
+      *ngIf="authService.isAdmin()" 
+      [routerLink]="['/tabs/roles/manage-roles']">
       <ion-label>MANAGE ROLES</ion-label>
     </ion-segment-button>
-
-    <ion-segment-button *ngIf="authService.isAdmin()" value="members" [routerLink]="['/tabs/roles/members']">
+    
+    <ion-segment-button 
+      value="members" 
+      *ngIf="authService.isAdmin()" 
+      [routerLink]="['/tabs/roles/members']">
       <ion-label>MEMBERS</ion-label>
     </ion-segment-button>
   </ion-segment>
 
-  <router-outlet></router-outlet> 
+  <!-- This is where the child pages (manage-roles, members) will appear -->
+  <router-outlet></router-outlet>
+
+  <!-- 
+    ✅ START OF NEW UI 
+    This is the default content for the "ROLES" section
+  -->
+  <div *ngIf="segment === 'roles'" class="segment-content">
+    
+    <!-- Loop over each week -->
+    <ion-card 
+      *ngFor="let week of roleSchedules" 
+      class="role-card"
+      [class.active-week]="week.isPrimaryWeek"
+      [class.inactive-week]="!week.isPrimaryWeek">
+      
+      <ion-card-header>
+        <ion-card-title>{{ week.date }}</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <!-- Loop over this user's assignments for that week -->
+        <div *ngFor="let assignment of week.assignments" class="role-item">
+          <div class="role-details">
+            <p>Your Role:</p>
+            <h3>{{ assignment.role }}</h3>
+            <p class="assigned-to">
+              {{ assignment.assignedTo ? assignment.assignedTo : 'You can volunteer here!' }}
+            </p>
+          </div>
+          
+          <!-- Status Button -->
+          <ion-button 
+            class="status-button"
+            fill="clear" 
+            (click)="onStatusClick(assignment)">
+            <ion-badge 
+              class="status-badge" 
+              [color]="getStatusColor(assignment.status)">
+              {{ assignment.status }}
+              <ion-icon name="chevron-down-outline" class="badge-icon"></ion-icon>
+            </ion-badge>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+  <!-- ✅ END OF NEW UI -->
+
 </ion-content>

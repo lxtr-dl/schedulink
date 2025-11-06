@@ -1,13 +1,93 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>manage-roles</ion-title>
-  </ion-toolbar>
-</ion-header>
+<!-- The <ion-header> is GONE (as you already removed) -->
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">manage-roles</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <!-- Padding fix for shared header -->
+  <div class="content-padding-top"></div>
+
+  <!-- ✅ THIS IS THE LOOP THAT WILL NOW WORK -->
+  <ion-card *ngFor="let schedule of schedules" 
+    class="schedule-card" 
+    [class.expanded]="schedule.isExpanded">
+    
+    <!-- Clickable Header (Figma Screen 2) -->
+    <!-- This will show "Sunday, June X", etc. -->
+    <ion-item button detail="false" (click)="toggleExpand(schedule)" class="schedule-header">
+      <ion-label>{{ schedule.date }}</ion-label>
+      <ion-icon 
+        slot="end" 
+        [name]="schedule.isExpanded ? 'chevron-up-outline' : 'chevron-down-outline'">
+      </ion-icon>
+    </ion-item>
+
+    <!-- EXPANDED CONTENT -->
+    <div *ngIf="schedule.isExpanded" class="expanded-content">
+      
+      <!-- =========== VIEW MODE (Figma Screen 3) ============ -->
+      <div *ngIf="!schedule.editMode">
+        <ion-list lines="full">
+          <!-- Edit button -->
+          <ion-item lines="none" class="edit-button-container">
+            <ion-button fill="clear" (click)="toggleEditMode(schedule)" slot="end">
+              <ion-icon slot="icon-only" name="pencil" color="primary"></ion-icon>
+            </ion-button>
+          </ion-item>
+
+          <!-- Full Lineup List -->
+          <ion-item *ngFor="let item of schedule.assignments" class="view-item">
+            <ion-label>
+              <h3>{{ item.role }}</h3>
+              <p>{{ getMemberName(item.assignedMemberId) }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
+      <!-- ======== END VIEW MODE ========== -->
+
+
+      <!-- =========== EDIT MODE (Figma Screen 4/5) ============ -->
+      <div *ngIf="schedule.editMode">
+        <ion-list lines="none">
+
+          <!-- Header for Edit Mode -->
+          <ion-item class="edit-header-item">
+            <ion-label>
+              <h2>Edit: {{ schedule.date }}</h2>
+            </ion-label>
+          </ion-item>
+          
+          <!-- Full Lineup *Form* -->
+          <ion-item *ngFor="let item of schedule.editableAssignments" class="edit-item">
+            <ion-label position="stacked">{{ item.role }}</ion-label>
+            <ion-select 
+              [(ngModel)]="item.assignedMemberId" 
+              placeholder="Select Member" 
+              interface="action-sheet">
+              <ion-select-option [value]="null">Unassigned</ion-select-option>
+              <ion-select-option *ngFor="let member of allMembers" [value]="member.id">
+                {{ member.name }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <!-- Save/Cancel Buttons -->
+          <ion-row class="ion-padding edit-buttons-row">
+            <ion-col>
+              <ion-button (click)="onSave(schedule)" expand="block" color="success">
+                <ion-icon slot="start" name="save-outline"></ion-icon>
+                Save
+              </ion-button>
+            </ion-col>
+            <ion-col>
+              <ion-button (click)="onCancel(schedule)" expand="block" fill="clear" color="danger">
+                Cancel
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-list>
+      </div>
+      <!-- ======== END EDIT MODE ========== -->
+
+    </div>
+  </ion-card>
+
 </ion-content>

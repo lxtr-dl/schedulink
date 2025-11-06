@@ -1,3 +1,154 @@
+// --- Color Variables based on your Figma/Line-Up Page ---
+:host {
+  --app-color-primary: #510662; 
+  --app-color-page-bg: #1c1c1e; // Very dark background
+  --app-color-text-primary: #ffffff; // White
+  --app-color-text-secondary: rgba(255, 255, 255, 0.7); // Faded white
+  
+  --app-color-segment-active-bg: var(--app-color-primary);
+  --app-color-segment-active-text: #ffffff;
+  --app-color-segment-inactive-bg: #f4f5f8; // Light gray for inactive
+  --app-color-segment-inactive-text: #1c1c1e; // Dark text for inactive
+}
+
+// --- Page Setup ---
 ion-content {
+  // 1. Set the main page background to dark
+  --background: var(--app-color-page-bg);
+
+  // 2. Keep the padding fix for the shared header
   --padding-top: calc(env(safe-area-inset-top) + var(--ion-toolbar-height, 56px));
+}
+
+// --- Segment Tabs Styling ---
+.segment-tabs {
+  background: var(--app-color-page-bg); // Match page background
+  padding: 10px 12px;
+  margin: 10px 16px; 
+  border-radius: 10px; 
+  box-shadow: none; // No shadow on dark background
+
+  ion-segment-button {
+    text-transform: none;
+    font-weight: 600;
+    --border-radius: 8px;
+    --indicator-color: transparent;
+    margin: 0 4px;
+
+    // 3. Style for INACTIVE tabs
+    --background: var(--app-color-segment-inactive-bg);
+    --color: var(--app-color-segment-inactive-text);
+
+    // 4. Style for ACTIVE tab
+    &.segment-button-checked {
+      --background: var(--app-color-segment-active-bg);
+      --color: var(--app-color-segment-active-text);
+    }
+  }
+
+  // 5. Center the single button for non-admins
+  &.member-view {
+    max-width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+// --- Content Area ---
+.segment-content {
+  padding: 0 16px;
+}
+
+// --- Role Card Styling ---
+.role-card {
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.3s ease-in-out;
+  
+  // ✅ Style for the primary, active week (PURPLE)
+  &.active-week {
+    --background: var(--ion-color-primary, #510662); // Your purple color
+    --color: var(--ion-color-primary-contrast, #ffffff);
+
+    ion-card-title {
+      color: var(--ion-color-primary-contrast, #ffffff);
+    }
+    .role-details p {
+      color: var(--app-color-text-secondary); // Faded white
+    }
+    .role-details h3 {
+      color: var(--app-color-text-primary); // White
+    }
+  }
+
+  // ✅ Style for inactive weeks (LIGHT GRAY)
+  &.inactive-week {
+    --background: #f4f5f8; // Light gray background
+    --color: #1c1c1e; // Dark text
+
+    ion-card-title {
+      color: #1c1c1e;
+    }
+    .role-details p {
+      color: var(--ion-color-medium-shade); // Gray
+    }
+    .role-details h3 {
+      color: #1c1c1e; // Dark text
+    }
+  }
+
+  ion-card-header {
+    --background: transparent; // Card itself has the background
+  }
+
+  ion-card-content {
+    padding-top: 0; // Remove extra padding
+  }
+}
+
+.role-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 8px;
+
+  .role-details {
+    p {
+      font-size: 0.8em;
+      margin: 0;
+      text-transform: uppercase;
+    }
+    h3 {
+      font-size: 1.2em;
+      font-weight: 600;
+      margin: 2px 0;
+    }
+    .assigned-to {
+      font-style: italic;
+      font-size: 0.9em;
+      text-transform: none; 
+    }
+  }
+
+  .status-button {
+    --padding-start: 0;
+    --padding-end: 0;
+  }
+  
+  .status-badge {
+    font-size: 0.8em;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 20px;
+    text-transform: capitalize;
+
+    .badge-icon {
+      margin-left: 4px;
+      font-size: 1.1em;
+    }
+  }
 }

@@ -1,0 +1,132 @@
+// --- Color Variables (from your music page theme) ---
+:host {
+  --app-color-primary: #510662; 
+  --app-color-page-bg: #1c1c1e; // Very dark background
+  --app-color-card-bg: var(--app-color-primary); // Purple for the main card
+  --app-color-text-primary: #ffffff; // White
+  --app-color-text-secondary: rgba(255, 255, 255, 0.7); // Faded white
+  --app-color-edit-input-bg: #6b2a82; // Lighter purple for inputs
+}
+
+// --- Page Setup ---
+ion-content {
+  // 1. Set the main page background to dark
+  --background: var(--app-color-page-bg);
+
+  // 2. Fix for the shared header overlap
+  --padding-top: calc(env(safe-area-inset-top) + var(--ion-toolbar-height, 56px));
+}
+
+// 3. Padding for the top of the content
+.content-padding-top {
+  height: 10px;
+}
+
+// --- Card Styling ---
+.schedule-card {
+  margin: 10px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  
+  // 4. Make all cards purple
+  background: var(--app-color-card-bg); 
+  color: var(--app-color-text-primary);
+
+  // Remove extra padding from card
+  ion-list {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.schedule-header {
+  // 5. Make card header transparent (it's part of the purple card)
+  --background: transparent;
+  --color: var(--app-color-text-primary);
+  --border-radius: 12px;
+  
+  ion-label {
+    font-size: 1.1em;
+    font-weight: 600;
+  }
+  
+  ion-icon {
+    color: var(--app-color-text-secondary);
+  }
+}
+
+// --- Expanded Content Container ---
+.expanded-content {
+  overflow: hidden;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+// --- View Mode Styling ---
+.edit-button-container {
+  --background: transparent; // Part of purple card
+  --padding-top: 0;
+  --padding-bottom: 0;
+  
+  ion-button {
+    --padding-start: 10px;
+    --padding-end: 10px;
+  }
+  ion-icon {
+    font-size: 1.4em;
+    color: var(--app-color-text-primary); // Make icon white
+  }
+}
+
+.view-item {
+  --background: transparent; // Part of purple card
+  
+  h3 {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: var(--app-color-text-primary); // White text
+  }
+  p {
+    font-size: 0.9em;
+    color: var(--app-color-text-secondary); // Faded white text
+  }
+}
+
+// --- Edit Mode Styling ---
+.edit-header-item {
+  --background: var(--app-color-card-bg); // Purple background
+  --color: var(--app-color-text-primary); // White text
+  border-bottom: 1px solid var(--ion-color-primary-shade, #470557);
+  
+  h2 {
+    font-size: 1.1em;
+    font-weight: 600;
+  }
+}
+
+.edit-item {
+  --background: var(--app-color-card-bg); // Purple background
+  --color: var(--app-color-text-primary); // White text
+  
+  ion-label {
+    font-size: 0.9em;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--app-color-text-secondary); // Faded white
+  }
+
+  ion-select {
+    --background: var(--app-color-edit-input-bg); // Lighter purple
+    --color: var(--app-color-text-primary);
+    --placeholder-color: var(--app-color-text-secondary);
+    border-radius: 8px;
+    width: 100%;
+    --padding-start: 12px;
+    --padding-end: 12px;
+  }
+}
+
+.edit-buttons-row {
+  background: var(--app-color-card-bg); // Purple background for buttons
+  padding-bottom: 16px;
+}
