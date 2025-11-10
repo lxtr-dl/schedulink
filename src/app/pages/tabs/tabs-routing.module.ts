@@ -24,6 +24,10 @@ const routes: Routes = [
         // Use loadComponent for standalone pages
         loadComponent: () => import('../music/music.page').then(m => m.MusicPage) 
       },
+      {
+        path: 'announcements',
+        loadChildren: () => import('../announcements/announcements.module').then( m => m.AnnouncementsPageModule)
+      },
       { path: '', redirectTo: '/tabs/home', pathMatch: 'full' }
     ]
   }

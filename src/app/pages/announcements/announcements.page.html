@@ -1,0 +1,49 @@
+<!-- No header, it's shared from tabs.page.html -->
+<ion-content>
+  <!-- Padding fix for shared header -->
+  <div class="content-padding-top"></div>
+
+  <!-- Loop over each announcement post -->
+  <ion-card *ngFor="let post of announcements" class="announcement-card">
+    <ion-card-header>
+      <ion-avatar>
+        <!-- Placeholder icon -->
+        <ion-icon name="person-circle" class="avatar-icon"></ion-icon>
+        <!-- Later: <img [src]="post.avatarUrl" *ngIf="post.avatarUrl" /> -->
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ post.author }}</h2>
+        <p>{{ post.date }}</p>
+      </ion-label>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p>{{ post.text }}</p>
+    </ion-card-content>
+
+    <!-- 👇 THIS IS THE FIX: Changed from 'ion-card-footer' to 'div' -->
+    <div class="card-footer">
+      <div class="like-section" (click)="toggleLike(post)">
+        <span>{{ post.likes }}</span>
+        <!-- Show filled or empty heart based on likedByUser state -->
+        <ion-icon 
+          [name]="post.likedByUser ? 'heart' : 'heart-outline'" 
+          [color]="post.likedByUser ? 'danger' : 'medium'">
+        </ion-icon>
+      </div>
+    </div>
+    <!-- 👇 THIS IS THE FIX: Changed from 'ion-card-footer' to 'div' -->
+  </ion-card>
+
+  <!-- 
+    Floating Action Button (FAB) for Admins
+    This button lets admins open the "create post" modal.
+    We use 'canPostAnnouncement()' from your AuthService.
+  -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="authService.canPostAnnouncement()">
+    <ion-fab-button (click)="presentCreateModal()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>

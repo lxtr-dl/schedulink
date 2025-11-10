@@ -1,0 +1,86 @@
+// --- Page Setup ---
+ion-content {
+  // 1. Set the main page background to dark
+  --background: #1c1c1e;
+
+  // 2. Keep the padding fix for the shared header
+  --padding-top: calc(env(safe-area-inset-top) + var(--ion-toolbar-height, 56px));
+}
+
+.content-padding-top {
+  height: 10px;
+}
+
+// --- Card Styling ---
+.announcement-card {
+  margin: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+  // 3. ✅ FIX: Set the card background to light (like your Figma)
+  --background: #f4f5f8; // Light gray background
+  background: #f4f5f8;
+  
+  ion-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px; 
+
+    ion-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--ion-color-light-tint);
+    }
+    
+    .avatar-icon {
+      width: 100%;
+      height: 100%;
+      color: var(--ion-color-medium-shade);
+    }
+
+    ion-label {
+      h2 {
+        // 4. ✅ FIX: Ensure text is dark
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #333; 
+      }
+      p {
+        font-size: 0.8em;
+        color: var(--ion-color-medium-shade);
+      }
+    }
+  }
+
+  ion-card-content {
+    p {
+      white-space: pre-wrap;
+      font-size: 1em;
+      line-height: 1.5;
+      // 5. ✅ FIX: Ensure text is dark
+      color: #222; 
+    }
+  }
+
+  // 6. ✅ FIX: Use the class selector '.card-footer'
+  .card-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 8px 16px;
+    border-top: 1px solid var(--ion-color-light-tint);
+
+    .like-section {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 1em;
+      color: var(--ion-color-medium-shade);
+      cursor: pointer;
+
+      ion-icon {
+        font-size: 1.4em;
+      }
+    }
+  }
+}

@@ -20,6 +20,8 @@ const routes: Routes = [
     canLoad: [AuthGuard], // Protect the profile page
     loadChildren: () => import('./pages/profile/profile.module').then( m => m.ProfilePageModule)
   },
+  
+
 
 
 ];

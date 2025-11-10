@@ -1,0 +1,19 @@
+ion-item {
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+.avatar-icon {
+  width: 40px;
+  height: 40px;
+  color: var(--ion-color-medium-shade);
+  background: var(--ion-color-light-tint);
+  border-radius: 50%;
+}
+
+.post-textarea {
+  font-size: 1.1em;
+  line-height: 1.5;
+  margin-top: 10px;
+  --padding-start: 0; // Align with avatar
+}
